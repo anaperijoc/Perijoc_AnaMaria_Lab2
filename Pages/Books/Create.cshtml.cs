@@ -59,6 +59,7 @@ namespace AnaMaria_Perijoc_Lab2.Pages.Books
             await _context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
+
         }
     }
 }
