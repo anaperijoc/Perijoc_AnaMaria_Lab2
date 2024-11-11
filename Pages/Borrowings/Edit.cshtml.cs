@@ -30,14 +30,32 @@ namespace AnaMaria_Perijoc_Lab2.Pages.Borrowings
                 return NotFound();
             }
 
-            var borrowing =  await _context.Borrowing.FirstOrDefaultAsync(m => m.ID == id);
+            var borrowing =  await _context.Borrowing
+                .Include(b => b.Book)
+                .ThenInclude(b => b.Author)
+                .Include(b => b.Member)
+                .FirstOrDefaultAsync(m => m.ID == id);
             if (borrowing == null)
             {
                 return NotFound();
             }
             Borrowing = borrowing;
-           ViewData["BookID"] = new SelectList(_context.Book, "ID", "ID");
-           ViewData["MemberID"] = new SelectList(_context.Member, "ID", "ID");
+
+            ViewData["MemberID"] = new SelectList(
+                _context.Member.Select(m => new
+                {
+                    m.ID,
+                    FullName = m.FirstName + " " + m.LastName
+                }), "ID", "FullName");
+
+            ViewData["BookID"] = new SelectList(
+                _context.Book.Include(b => b.Author).Select(b => new
+                {
+                    b.ID,
+                    BookDetails = b.Title + " - " + b.Author.FirstName + " " + b.Author.LastName
+
+                }),
+                "ID", "BookDetails");
             return Page();
         }
 
